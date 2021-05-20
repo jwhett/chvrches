@@ -1,44 +1,68 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-
 const { TOKEN } = require('./auth.json');
-const { appID, perms, ytLink, church, prefix, role, modRole } = require('./config.json');
+const { appID, perms, ytLink, church, prefix, role, modRole, duration } = require('./config.json');
 const churchRegex = /c+h+[uv]+r+c+h+e+s+/gi;
 const invLink = `https://discord.com/oauth2/authorize?client_id=${appID}&scope=bot&permissions=${perms}`;
+var ourGuild;
+var cornerRole;
 var disabled = false;
 
 client.on('ready', () => {
     console.log(`${church} Logged in as ${client.user.tag}! Invite link: ${invLink}`);
     client.user.setPresence({ activity: { name: `with ${church}s` }, status: 'online' });
+    try {
+        // this assumes we're only connected to INVT
+        ourGuild = client.guilds.cache.find(g => g.name === "Bike Shed");
+        cornerRole = ourGuild.roles.cache.find(r => r.name === role);
+    } catch(error) {
+        console.error("unable to find guild or role");
+    }
 });
 
 client.login(TOKEN);
 
 client.on('message', message => {
-	if (message.author.bot || disabled) return;
+	if (message.author.bot) return;
 	if (message.content.startsWith(prefix)) handleCommands(message);
-        if (churchRegex.test(message.content)) message.react(church);
+        if (churchRegex.test(message.content)) putInCorner(message.member);
 });
 
 function handleCommands(message) {
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
-	const command = args.shift().toLowerCase();
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
 
-        switch (command) {
-            case 'enable':
-                if (isMod(message, message.author)) enable();
-                break;
-            case 'disable':
-                if (isMod(message, message.author)) disable();
-                break;
-            case 'help':
-                if (isMod(message, message.author)) sendHelp();
-                break;
-        }
+    switch (command) {
+        case 'enable':
+            if (isMod(message, message.author)) enable();
+            break;
+        case 'disable':
+            if (isMod(message, message.author)) disable();
+            break;
+        case 'status':
+            if (isMod(message, message.author)) status(message);
+            break;
+    }
 }
 
-function corner(user) {
-    // TODO
+function putInCorner(member) {
+    try {
+        member.roles.add(cornerRole);
+        member.user.send(ytLink);
+    } catch(error) {
+        console.error(`Failed to add role: ${error}`)
+    }
+    console.log(`${member.user.username} is now in the corner for ${duration/1000} seconds!`);
+    return setTimeout(setFree, duration, member);
+}
+
+function setFree(member) {
+    try {
+        member.roles.remove(cornerRole);
+    } catch(error) {
+        console.error(`failed to remove error: ${error}`);
+    }
+    console.log(`${member.user.username} was set free...`);
 }
 
 function isMod(message, user) {
@@ -60,6 +84,6 @@ function enable() {
     console.log("bot enabled");
 }
 
-function sendHelp(message) {
-    message.channel.send(`TO THE CORNER.`);
+function status(message) {
+    message.channel.send(`Online - disabled? ${disabled}`);
 }
