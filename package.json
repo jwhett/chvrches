@@ -1,0 +1,27 @@
+{
+  "name": "chvrches",
+  "version": "0.0.1",
+  "description": "Discord bot that punishes those that take Chvrches in vain",
+  "main": "main.js",
+  "scripts": {
+    "bot": "node main.js",
+    "lint": "eslint main.js --fix",
+    "lint-init": "eslint --init"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwhett/chvrches.git"
+  },
+  "author": "Josh Whetton",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/jwhett/chvrches/issues"
+  },
+  "homepage": "https://github.com/jwhett/chvrches#readme",
+  "dependencies": {
+    "discord.js": "^12.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.26.0"
+  }
+}
