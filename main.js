@@ -1,7 +1,17 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const { TOKEN } = require('./auth.json');
-const { appID, perms, ytLink, church, prefix, role, modRole, duration } = require('./config.json');
+
+const role = process.env.role;
+const token = process.env.token;
+const appID = process.env.appID;
+const perms = process.env.perms;
+const ytLink = process.env.ytLink;
+const church = process.env.church;
+const prefix = process.env.prefix;
+const modRole = process.env.modRole;
+const duration = process.env.duration;
+const guildName = process.env.guildName;
+
 const churchRegex = /c+h+[uv]+r+c+h+e+s+/gi;
 const invLink = `https://discord.com/oauth2/authorize?client_id=${appID}&scope=bot&permissions=${perms}`;
 var ourGuild;
@@ -13,14 +23,14 @@ client.on('ready', () => {
     client.user.setPresence({ activity: { name: `with ${church}s` }, status: 'online' });
     try {
         // this assumes we're only connected to INVT
-        ourGuild = client.guilds.cache.find(g => g.name === "Bike Shed");
+        ourGuild = client.guilds.cache.find(g => g.name === guildName);
         cornerRole = ourGuild.roles.cache.find(r => r.name === role);
     } catch(error) {
         console.error("unable to find guild or role");
     }
 });
 
-client.login(TOKEN);
+client.login(token);
 
 client.on('message', message => {
 	if (message.author.bot) return;
