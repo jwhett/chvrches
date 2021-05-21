@@ -12,7 +12,7 @@ const modRole = process.env.modRole;
 const duration = process.env.duration;
 const guildName = process.env.guildName;
 
-const churchRegex = /c+h+[uv]+r+c+h+e+s+/gi;
+const churchRegex = /c+h+u+r+c+h+e+s+/gi;
 const invLink = `https://discord.com/oauth2/authorize?client_id=${appID}&scope=bot&permissions=${perms}`;
 var ourGuild;
 var cornerRole;
