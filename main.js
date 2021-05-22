@@ -11,9 +11,9 @@ const prefix = process.env.prefix;
 const modRole = process.env.modRole;
 const duration = process.env.duration;
 const guildName = process.env.guildName;
-
 const churchRegex = /c+h+[a|e|i|o|u]+r+c+h+l?e+[s|z]+/gi;
 const invLink = `https://discord.com/oauth2/authorize?client_id=${appID}&scope=bot&permissions=${perms}`;
+
 var ourGuild;
 var cornerRole;
 var disabled = false;
@@ -22,15 +22,12 @@ client.on('ready', () => {
     console.log(`${church} Logged in as ${client.user.tag}! Invite link: ${invLink}`);
     client.user.setPresence({ activity: { name: `with ${church}s` }, status: 'online' });
     try {
-        // this assumes we're only connected to INVT
         ourGuild = client.guilds.cache.find(g => g.name === guildName);
         cornerRole = ourGuild.roles.cache.find(r => r.name === role);
     } catch(error) {
-        console.error("unable to find guild or role");
+        console.error(`cannot find guild or role: ${error}`);
     }
 });
-
-client.login(token);
 
 client.on('message', message => {
 	if (message.author.bot) return;
@@ -38,19 +35,22 @@ client.on('message', message => {
         if (churchRegex.test(message.content)) putInCorner(message.member);
 });
 
+client.login(token);
+
 function handleCommands(message) {
+    if (!isMod(message, message.author)) return;
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
     switch (command) {
         case 'enable':
-            if (isMod(message, message.author)) enable();
+            enable();
             break;
         case 'disable':
-            if (isMod(message, message.author)) disable();
+            disable();
             break;
         case 'status':
-            if (isMod(message, message.author)) status(message);
+            status(message);
             break;
     }
 }
